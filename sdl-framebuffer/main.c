@@ -12,6 +12,13 @@
 #define GREEN 0x00FF00
 #define BLUE 0x0000FF
 
+uint32_t framebuffer[WIDTH*HEIGHT]; //unsigned 32b(=4B) int (2^32 instead of 2^31 if signed)
+
+uint32_t frame = 0x000000;
+uint32_t temp = 0x000000;
+
+uint32_t c_array[3] = {RED, GREEN, BLUE}; 
+
 /*
 	Error handling: 
 	SDL functions return 0 if everything went well, an error code otherwise
@@ -20,7 +27,6 @@
 	SDL_init is kinda like a malloc, so it needs SDL_Quit() kinda like free().
 	Same goes for texture, renderer and window
 */
-
 int errorHandling(SDL_Window *window, SDL_Renderer *renderer, SDL_Texture *texture){
 	if(window == NULL || renderer == NULL || texture == NULL){
 		if(window!=NULL) SDL_DestroyTexture(texture);
@@ -33,7 +39,28 @@ int errorHandling(SDL_Window *window, SDL_Renderer *renderer, SDL_Texture *textu
 	}
 }
 
-uint32_t framebuffer[WIDTH*HEIGHT]; //unsigned 32b(=4B) int (2^32 instead of 2^31 if signed)
+// framebuffer-related functions
+/* putPixel
+	puts a pixel with the color of the specified HEX code at the specified pixel
+	@returns EXIT_FAILURE if coordinates are out of the framebuffer boundaries
+*/
+int putPixel(int x, int y, uint32_t color){
+		if(x<=0 || x>WIDTH || y<=0 || y>HEIGHT){
+			fprintf(stderr, "Pixel coordinates are out of bound, current resolution is: %dx%d\n", WIDTH, HEIGHT);
+			printf("x: %d, y: %d", x, y);
+			return EXIT_FAILURE;
+		}
+		x-=1;
+		y-=1;
+		framebuffer[y*WIDTH + x] = color;
+}
+
+void clearFramebuffer(){
+	for(int i = 0; i<WIDTH*HEIGHT; i++){
+		framebuffer[i] = 0x000000;
+	}
+}
+
 int main(void){
 	if (!SDL_Init(SDL_INIT_VIDEO)){ //initialize SDL
 		fprintf(stderr, "SDL_Init failed: %s \n", SDL_GetError());
@@ -68,23 +95,44 @@ int main(void){
 			}
 		}
 
-		void putPixel(int x, int y, uint32_t color){
-			x-=1;
-			y-=1;
-			framebuffer[y*WIDTH + x] = color;
-		}
+		//Update pixels in framebuffer
 
-		putPixel(60, 60, RED);
-		putPixel(90, 60, GREEN);
-		putPixel(120, 60, BLUE);
-		putPixel(159, 100, 0xFFFFFF);
-
-		//update the framebuffer coordinate = width*height 
+		/* NOT ON PURPOSE BUT SUPER COOL*/
 		
-		// for (int i=0; i<320; i++){
-		// 	framebuffer[i] = 0x00FF00;
+
+		//asymptote
+		//uint32_t color = 0x000000;
+		// for(int i = 1; i<=200; i++){
+		// 	putPixel((frame%320)+1, i, color);
+		// 	if(color>=0xFFFFFF) break;
+		// 	color+=(frame%0xFFFFFF);
 		// }
 
+		/* explosion*/
+		/*
+		for(int i = 1; i<=200; i++){
+			if(frame>=0x0000FF){
+				frame+=0x0000FF;
+			}else if(frame>=0x00FF00){
+				frame+=0x00FF00;
+			}else if(frame>=0xFF0000) frame+= 0xFF0000;
+
+			putPixel((frame%320)+1, i, (frame)%0xFFFFFF);
+			}
+		}*/
+
+		//shooting starts
+		// uint32_t color = 0x000000;
+		// putPixel(frame%320, (frame)%200, color+=(frame)%0xFFFFFF);
+
+		
+
+		// for(int i = 1; i<=200; i++){
+		// 	putPixel((frame%320)+1, i, ((frame << 16) | (frame << 8) | frame)%0xFFFFFF);
+		// }
+
+		printf("%#08X \n", ((frame << 16) | (frame << 8) | frame)%0xFFFFFF);
+		
 		//some error handling would be nice. But i want to keep this clean as this program is for learning purposes
 		//update and display everything
 		SDL_UpdateTexture(texture, NULL, framebuffer, PITCH); //2nd arg = dimensions to update, NULL = update everything, last arg = pitch (see macros)
@@ -96,9 +144,9 @@ int main(void){
 		double tickTime = (double)(end-start) / (double)(SDL_GetPerformanceFrequency()); //getPerformanceFrequency measures the frequency/s of which getPerformanceCounter is adjusted
 
 		if(tickTime<0.016){ //more than 60fps
-			SDL_Delay((0.016 - tickTime)*1000.0); //delay in seconds, so we go from ms to s
+			SDL_Delay((0.016 - tickTime)*1000.0); //delay in ms
 		}
-
+		frame++;
 	}
 
 	//Free everything from memory
