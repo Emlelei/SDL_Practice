@@ -11,10 +11,23 @@
 #define RED 0xFF0000
 #define GREEN 0x00FF00
 #define BLUE 0x0000FF
+#define WHITE 0xFFFFFF
 
 uint32_t framebuffer[WIDTH*HEIGHT]; //unsigned 32b(=4B) int (2^32 instead of 2^31 if signed)
 
 uint32_t frame = 0x000000;
+
+/* some useful functions */
+//returns x if its strictly bigger than y, y otherwise
+int max(int x, int y){
+	if(x>y) return x;
+		return y;
+}
+//returns x if its strictly smaller than y, y otherwise
+int min(int x, int y){
+	if(x<y) return x;
+		return y;
+}
 
 /*
 	Error handling: 
@@ -49,7 +62,9 @@ int putPixel(int x, int y, uint32_t color){
 		}
 		x-=1;
 		y-=1;
-		framebuffer[y*WIDTH + x] = color;
+		// framebuffer[y*WIDTH + x] = color; old way, inverted y
+		int offset = ((HEIGHT-1)*WIDTH);
+		framebuffer[offset - (y*WIDTH) + x] = color; //correct y
 }
 
 void clearFramebuffer(){
@@ -94,9 +109,28 @@ int main(void){
 
 		//Update pixels in framebuffer
 
+		int drawLine(int x1, int y1, int x2, int y2){
+			//preventing out of bound
+			if(x1<=0 || x1>WIDTH || y1<=0 || y1>HEIGHT ||x2<=0 || x2>WIDTH || y2<=0 || y2>HEIGHT){
+			fprintf(stderr, "Pixel coordinates are out of bound, current resolution is: %dx%d\n", WIDTH, HEIGHT);
+			printf("x1: %d, y1: %d", x1, y1);
+			printf("\nx2: %d, y2: %d", x2, y2);
+			return EXIT_FAILURE;
+			}
+
+			//putting the pixels
+
+			for(int i = 1; i<=max(x1, x2)-min(x1, x2); i++){
+				putPixel(min(x1, x2)+i, min(y1, y2)+i, WHITE);
+			}
+
+			putPixel(x1, y1, BLUE);
+			putPixel(x2, y2, RED);
+		}
 		
-
-
+		drawLine(140, 100, 160, 120);
+		
+		//END OF BUFFER MANIPULATION
 
 		//some error handling would be nice. But i want to keep this clean as this program is for learning purposes
 		//update and display everything
