@@ -101,7 +101,7 @@ int main(void){
 		
 
 		//asymptote
-		//uint32_t color = 0x000000;
+		// uint32_t color = 0x000000;
 		// for(int i = 1; i<=200; i++){
 		// 	putPixel((frame%320)+1, i, color);
 		// 	if(color>=0xFFFFFF) break;
@@ -109,29 +109,29 @@ int main(void){
 		// }
 
 		/* explosion*/
-		/*
-		for(int i = 1; i<=200; i++){
-			if(frame>=0x0000FF){
-				frame+=0x0000FF;
-			}else if(frame>=0x00FF00){
-				frame+=0x00FF00;
-			}else if(frame>=0xFF0000) frame+= 0xFF0000;
+		// for(int i = 1; i<=200; i++){
+		// 	if(frame>=0x0000FF){
+		// 		frame+=0x0000FF;
+		// 	}else if(frame>=0x00FF00){
+		// 		frame+=0x00FF00;
+		// 	}else if(frame>=0xFF0000) frame+= 0xFF0000;
 
-			putPixel((frame%320)+1, i, (frame)%0xFFFFFF);
-			}
-		}*/
+		// 	putPixel((frame%320)+1, i, (frame)%0xFFFFFF);
+		// }
 
 		//shooting starts
 		// uint32_t color = 0x000000;
 		// putPixel(frame%320, (frame)%200, color+=(frame)%0xFFFFFF);
-
 		
-
 		// for(int i = 1; i<=200; i++){
 		// 	putPixel((frame%320)+1, i, ((frame << 16) | (frame << 8) | frame)%0xFFFFFF);
 		// }
 
-		printf("%#08X \n", ((frame << 16) | (frame << 8) | frame)%0xFFFFFF);
+		// for(int i= 1; i<=200; i++){
+		// 	putPixel((frame%320)+1, i, (c_array[i%3]+i*frame)%0xFFFFFF);
+		// }
+
+		//printf("%#08X \n", ((frame << 16) | (frame << 8) | frame)%0xFFFFFF);
 		
 		//some error handling would be nice. But i want to keep this clean as this program is for learning purposes
 		//update and display everything
